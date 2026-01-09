@@ -35,7 +35,6 @@ export const defaults = {
     fontFamily: 'GilroyRegular',
     font1: 'GilroyMedium',
     font2: 'GilroySemiBold',
-    font3: 'GilroyBold',
     disconnectedColor: '#E84B15',
     borderRadius: 13,
     waterCardColor: '#0074F6',

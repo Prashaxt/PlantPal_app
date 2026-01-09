@@ -3,21 +3,17 @@
     "name": "PlantPal",
     "slug": "PlantPal",
     "version": "1.0.0",
-    
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-screen.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "permissions": ["INTERNET"],
+      "permissions": [
+        "INTERNET"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
@@ -30,8 +26,16 @@
     },
     "plugins": [
       "expo-localization",
-      "expo-font"
-      
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-screen.png",
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-asset"
     ]
   }
 }
