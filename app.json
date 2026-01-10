@@ -32,7 +32,7 @@
         {
           "backgroundColor": "#ffffff",
           "image": "./assets/splash-screen.png",
-          "resizeMode": "contain"
+          "resizeMode": "cover"
         }
       ],
       "expo-asset"
