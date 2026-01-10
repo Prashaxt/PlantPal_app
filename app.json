@@ -19,7 +19,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.PlantPal"
+      "package": "com.example.plantpal"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +36,11 @@
         }
       ],
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8747c833-3ece-4a08-afa1-7eff2b23c24c"
+      }
+    }
   }
 }

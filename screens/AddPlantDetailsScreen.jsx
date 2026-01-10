@@ -56,7 +56,7 @@ const AddPlantDetailsScreen = ({ route, navigation }) => {
       commonName: commonName.trim(),
       nickname: nickname.trim(),
       imageIndex: selectedImageIndex,
-      birthday: birthday ? formatDate(birthday) : formatDate(new Date()), // default today
+      birthday: birthday ? formatDate(birthday) : formatDate(new Date()),
       autoWateredEnabled,
       waterDuration: parseInt(waterDuration),
     };
