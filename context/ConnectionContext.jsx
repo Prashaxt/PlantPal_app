@@ -98,23 +98,31 @@ export const ConnectionProvider = ({ children }) => {
 
     // Helper to check lastUpdate for activity
     const handleUpdateCheck = (data) => {
-      const newUpdate = data?.sensorData?.lastUpdate;
-      if (!newUpdate) {
+      const newUpdateRaw = data?.sensorData?.lastUpdate;
+      if (!newUpdateRaw) {
         console.log("[ERROR] sensorData.lastUpdate missing or null.");
         setHardwareActive(false);
         return;
       }
 
+      // Convert to number safely (works for both string ISO and numeric timestamp)
+      const newUpdate = Number(newUpdateRaw);
+      if (Number.isNaN(newUpdate)) {
+        console.log("[ERROR] lastUpdate is not a valid number:", newUpdateRaw);
+        setHardwareActive(false);
+        return;
+      }
+
       if (lastKnownUpdate.current === null) {
+        console.log("[STATUS] First value → assuming active");
         lastKnownUpdate.current = newUpdate;
         setHardwareActive(true);
         return;
       }
-
-      if (newUpdate !== lastKnownUpdate.current) {
-        console.log("[STATUS] Hardware is active (lastUpdate changed to:", newUpdate, ")");
-        setHardwareActive(true);
+      if (newUpdate > lastKnownUpdate.current) {        
+        console.log("[ACTIVE] Timestamp increased:", newUpdate);
         lastKnownUpdate.current = newUpdate;
+        setHardwareActive(true);
       } else {
         console.log("[STATUS] Hardware inactive (lastUpdate unchanged):", newUpdate);
         setHardwareActive(false);

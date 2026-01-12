@@ -34,13 +34,35 @@ const WaterNowCard = () => {
 
     const AnimatedLottieView = Animated.createAnimatedComponent(LottieView);
 
+
+    //
     useEffect(() => {
+        if (modalOneVisible) {
         const listener = animationProgress.addListener(({ value }) => {
             setPercent(Math.round(value * 100)); // (0-100 only)
         });
 
         return () => animationProgress.removeListener(listener);
-    }, [animationProgress]);
+    }
+    }, [modalOneVisible, animationProgress]);
+
+    useEffect(() => {
+    if (modalOneVisible) {
+      animationProgress.setValue(0);
+      setPercent(0);
+      Animated.timing(animationProgress, {
+        toValue: 1,
+        duration: duration * 1000,
+        useNativeDriver: false,
+      }).start(({ finished }) => {
+        if (finished) {
+          updateMotorStatus(false);
+          setModalOneVisible(false);
+          setModalTwoVisible(true);
+        }
+      });
+    }
+  }, [modalOneVisible, duration, updateMotorStatus]);
 
 
 
@@ -55,28 +77,11 @@ const WaterNowCard = () => {
             return;
         }
 
-        // Open modal
-        setModalOneVisible(true);
-
         // Turn motor on
         updateMotorStatus(true);
-
-        // Reset and start animation progress from 0 to 1 over `duration`
-        animationProgress.setValue(0);
-        setPercent(0);
-        Animated.timing(animationProgress, {
-            toValue: 1,
-            duration: duration * 1000,
-            useNativeDriver: false,
-        }).start();
-
-
-        // Auto-turn off after `duration`
-        timeoutRef.current = setTimeout(() => {
-            updateMotorStatus(false);
-            setModalOneVisible(false);
-            setModalTwoVisible(true);
-        }, duration * 1000);
+        
+        // Open modal
+        setModalOneVisible(true);
     };
 
     const cancelWatering = () => {

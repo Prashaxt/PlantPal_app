@@ -168,7 +168,7 @@ function RootNavigator({ isFirstLaunch }) {
           <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
         </>
       )}
-    </Stack.Navigator>
+    </Stack.Navigator> 
   );
 }
 
@@ -193,7 +193,7 @@ export default function App() {
 
         // Check for first launch
         const hasLaunched = await AsyncStorage.getItem('hasLaunched');
-        setIsFirstLaunch(hasLaunched === null); // True if first time (null), false otherwise
+        setIsFirstLaunch(hasLaunched === null); 
 
         //Fonts loading
         await Font.loadAsync({
