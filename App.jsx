@@ -211,14 +211,14 @@ export default function App() {
           Asset.fromModule(require('./assets/homeInactiveLight1.png')).downloadAsync(),
 
           Asset.fromModule(require('./assets/gardenActiveDark.png')).downloadAsync(),
-          Asset.fromModule(require('./assets/gardenInActiveDark.png')).downloadAsync(),
+          Asset.fromModule(require('./assets/gardenInactiveDark.png')).downloadAsync(),
           Asset.fromModule(require('./assets/gardenActiveLight.png')).downloadAsync(),
-          Asset.fromModule(require('./assets/gardenInActiveLight.png')).downloadAsync(),
+          Asset.fromModule(require('./assets/gardenInactiveLight.png')).downloadAsync(),
 
           Asset.fromModule(require('./assets/profileActiveDark.png')).downloadAsync(),
-          Asset.fromModule(require('./assets/profileInActiveDark.png')).downloadAsync(),
+          Asset.fromModule(require('./assets/profileInactiveDark.png')).downloadAsync(),
           Asset.fromModule(require('./assets/profileActiveLight.png')).downloadAsync(),
-          Asset.fromModule(require('./assets/profileInActiveLight.png')).downloadAsync(),
+          Asset.fromModule(require('./assets/profileInactiveLight.png')).downloadAsync(),
         ]);
 
         // Example delay (replace with real loading)

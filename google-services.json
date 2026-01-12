@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "735315687040",
+    "firebase_url": "https://plant-pal-9088a-default-rtdb.firebaseio.com",
+    "project_id": "plant-pal-9088a",
+    "storage_bucket": "plant-pal-9088a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735315687040:android:79cc01fa5db20a0aa8d865",
+        "android_client_info": {
+          "package_name": "com.example.plantpal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfm4AIdkpFRNCRHCyRzZ5lPkCP_shyZTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
