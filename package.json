@@ -2,6 +2,13 @@
   "name": "plantpal",
   "version": "1.0.0",
   "main": "index.jsx",
+  "expo": {
+    "install": {
+      "exclude": [
+        "@react-native-async-storage/async-storage"
+      ]
+    }
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
