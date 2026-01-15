@@ -33,8 +33,7 @@
         {
           "backgroundColor": "#ffffff",
           "image": "./assets/splash-screen.png",
-          "resizeMode": "contain",
-          "imageWidth": 250
+          "resizeMode": "cover"
         }
       ],
       "expo-asset"
