@@ -36,21 +36,78 @@ export default function EditProfileScreen({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [password, setPassword] = useState('');
 
+    //states for tracking changes
+    const [originalName, setOriginalName] = useState('');
+    const [originalAvatarUri, setOriginalAvatarUri] = useState(null);
+    const [pendingAvatarUri, setPendingAvatarUri] = useState(null);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
     const { theme } = useContext(ThemeContext);
 
     const avatarFile = new File(Paths.document, `avatar_${user.uid}.jpg`);
+    const tempAvatarFile = new File(Paths.document, `temp_avatar_${user.uid}.jpg`);
 
     useEffect(() => {
-        if (userData?.name) setName(userData.name);
+        if (userData?.name) {
+            setName(userData.name);
+            setOriginalName(userData.name);
+        }
     }, [userData]);
 
     useEffect(() => {
         if (avatarFile.exists) {
-            setAvatarUri(avatarFile.uri);
+            const uri = avatarFile.uri;
+            setAvatarUri(uri);
+            setOriginalAvatarUri(uri);
         } else {
             setAvatarUri(null);
+            setOriginalAvatarUri(null);
         }
     }, [user.uid]);
+
+    // Track unsaved changes
+    useEffect(() => {
+        const nameChanged = name.trim() !== originalName;
+        const avatarChanged = pendingAvatarUri !== null;
+        setHasUnsavedChanges(nameChanged || avatarChanged);
+    }, [name, originalName, pendingAvatarUri]);
+
+    // Handle back button press
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            if (!hasUnsavedChanges) {
+                // No unsaved changes, allow navigation
+                return;
+            }
+
+            // Prevent default behavior of leaving the screen
+            e.preventDefault();
+ 
+            // Prompt the user before leaving the screen
+            Alert.alert(
+                'Save Changes?',
+                'You have unsaved changes. Are you sure you want to discard them?',
+                [
+                    {
+                        text: 'Discard',
+                        style: 'destructive',
+                        onPress: async () => {
+                            if (tempAvatarFile.exists) {
+                                await tempAvatarFile.delete();
+                            }
+                            navigation.dispatch(e.data.action);
+                        },
+                    },
+                    { text: "Save", style: 'cancel', onPress: () => {
+                        handleSave();
+                    } },
+                ],
+                { cancelable: true }
+            );
+        });
+
+        return unsubscribe;
+    }, [navigation, hasUnsavedChanges]);
 
     const changeAvatar = async () => {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -79,13 +136,16 @@ export default function EditProfileScreen({ navigation }) {
 
             const tempFile = new File(manipResult.uri);
 
-            if (avatarFile.exists) {
-                await avatarFile.delete();
+            // Delete old temp file if exists
+            if (tempAvatarFile.exists) {
+                await tempAvatarFile.delete();
             }
 
-            await tempFile.copy(avatarFile);
+            // Save to temporary location
+            await tempFile.copy(tempAvatarFile);
 
-            setAvatarUri(avatarFile.uri);
+            // Update preview with pending avatar
+            setPendingAvatarUri(tempAvatarFile.uri);
             setCacheBuster(Date.now());
         } catch (error) {
             console.error('Error processing avatar:', error);
@@ -94,10 +154,7 @@ export default function EditProfileScreen({ navigation }) {
     };
 
     const removeAvatar = async () => {
-        if (avatarFile.exists) {
-            await avatarFile.delete();
-        }
-        setAvatarUri(null);
+        setPendingAvatarUri('removed');
         setCacheBuster(Date.now());
     };
 
@@ -109,6 +166,7 @@ export default function EditProfileScreen({ navigation }) {
 
         setLoading(true);
         try {
+            // Update name if changed
             if (user.displayName !== name.trim()) {
                 await updateProfile(user, { displayName: name.trim() });
             }
@@ -118,6 +176,34 @@ export default function EditProfileScreen({ navigation }) {
                 await updateDoc(userRef, { name: name.trim() });
                 setUserData({ ...userData, name: name.trim() });
             }
+
+            // Handle avatar changes
+            if (pendingAvatarUri === 'removed') {
+                // Remove avatar
+                if (avatarFile.exists) {
+                    await avatarFile.delete();
+                }
+                setAvatarUri(null);
+                setOriginalAvatarUri(null);
+            } else if (pendingAvatarUri) {
+                // Save new avatar
+                if (avatarFile.exists) {
+                    await avatarFile.delete();
+                }
+                await tempAvatarFile.copy(avatarFile);
+                setAvatarUri(avatarFile.uri);
+                setOriginalAvatarUri(avatarFile.uri);
+            }
+
+            // Clean up temp file
+            if (tempAvatarFile.exists) {
+                await tempAvatarFile.delete();
+            }
+
+            // Reset tracking states
+            setPendingAvatarUri(null);
+            setOriginalName(name.trim());
+            setHasUnsavedChanges(false);
 
             Alert.alert('Success', 'Profile updated successfully.', [
                 {
@@ -165,6 +251,9 @@ export default function EditProfileScreen({ navigation }) {
             if (avatarFile.exists) {
                 await avatarFile.delete();
             }
+            if (tempAvatarFile.exists) {
+                await tempAvatarFile.delete();
+            }
             await deleteDoc(doc(fsdb, 'users', user.uid));
             await deleteUser(user);
             await logout();
@@ -184,7 +273,20 @@ export default function EditProfileScreen({ navigation }) {
         }
     };
 
+    // Get display URI for avatar
+    const getDisplayAvatarUri = () => {
+        if (pendingAvatarUri === 'removed') {
+            return null;
+        }
+        if (pendingAvatarUri) {
+            return pendingAvatarUri;
+        }
+        return avatarUri;
+    };
+
     if (!userData) return null;
+
+    const displayUri = getDisplayAvatarUri();
 
     return (
         <KeyboardAvoidingView
@@ -200,9 +302,9 @@ export default function EditProfileScreen({ navigation }) {
                 {/* Avatar Section */}
                 <View style={styles.avatarSection}>
                     <View style={styles.avatarPlaceholder}>
-                        {avatarUri ? (
+                        {displayUri ? (
                             <Image
-                                source={{ uri: avatarUri + '?cb=' + cacheBuster }}
+                                source={{ uri: displayUri + '?cb=' + cacheBuster }}
                                 style={styles.avatarImage}
                             />
                         ) : (
@@ -215,7 +317,7 @@ export default function EditProfileScreen({ navigation }) {
                             <Text style={[styles.changePhotoText, { color: theme.text }]}>Change Profile Photo</Text>
                         </TouchableOpacity>
 
-                        {avatarUri && (
+                        {displayUri && (
                             <TouchableOpacity style={styles.removePhotoButton} onPress={removeAvatar}>
                                 <Text style={styles.removePhotoText}>Remove Profile Photo</Text>
                             </TouchableOpacity>

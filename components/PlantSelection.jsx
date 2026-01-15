@@ -1,5 +1,5 @@
 import { lightTheme, darkTheme, defaults } from '../designToken';
-import { View, StyleSheet, Image, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, BackHandler } from 'react-native';
 import AppText from '../components/AppText';
 import React, { useCallback, useContext, useMemo, forwardRef, useEffect, useState } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
@@ -8,9 +8,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { PlantContext } from '../context/PlantContext';
 import { FlatList } from 'react-native-gesture-handler';
 import { BottomSheetModal, BottomSheetView, BottomSheetFlatList, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackHandler } from 'react-native';
-import { plantMascotImages } from './plantMascotImages';
+
 
 //Plant Selection Bottom Sheet --------------------------------------------------------------------------------
 
@@ -44,7 +42,6 @@ const PlantSelectionSheet = forwardRef(({ closeModal, ...props }, ref) => {
         </TouchableOpacity>
     );
 
-    // Use BottomSheetBackdrop for backdrop
     const renderBackdrop = useCallback(
         (backdropProps) => (
             <BottomSheetBackdrop
@@ -98,18 +95,40 @@ const PlantSelection = () => {
     const { selectedPlant } = useContext(PlantContext);
 
     const bottomSheetModalRef = React.useRef(null);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     const handleOpenModal = useCallback(() => {
         bottomSheetModalRef.current?.present();
+        setIsSheetOpen(true);
     }, []);
 
     const closeModal = useCallback(() => {
         bottomSheetModalRef.current?.dismiss();
+        setIsSheetOpen(false);
     }, []);
 
     const handleOpenSelection = () => {
         handleOpenModal();
     };
+
+    // Handle Android back button
+    useEffect(() => {
+        const onBackPress = () => {
+            if (isSheetOpen) {
+                closeModal();
+                return true; // Prevent default back behavior
+            }
+            return false; // Allow default back behavior
+        };
+
+        if (Platform.OS === 'android') {
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => {
+                backHandler.remove();
+            };
+        }
+    }, [isSheetOpen, closeModal]);
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -155,6 +174,7 @@ const PlantSelection = () => {
                 <PlantSelectionSheet
                     ref={bottomSheetModalRef}
                     closeModal={closeModal}
+                    onDismiss={() => setIsSheetOpen(false)}
                 />
             </View>
         </View>

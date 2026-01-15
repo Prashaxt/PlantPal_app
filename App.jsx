@@ -1,5 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useContext, useEffect, useState } from 'react';
+import * as NavigationBar from 'expo-navigation-bar';
 import { FontProvider } from './context/FontContext';
 import { View, StyleSheet, Text } from 'react-native';
 import { ThemeContext, ThemeProvider } from './context/ThemeContext';
@@ -40,6 +41,17 @@ SplashScreen.preventAutoHideAsync();
 function AuthenticatedApp() {
   const { theme, isDark } = useContext(ThemeContext);
 
+
+  //NavBar theme settings
+  useEffect(() => {
+    NavigationBar.setBackgroundColorAsync(theme.background);
+
+    NavigationBar.setButtonStyleAsync(
+      isDark ? 'light' : 'dark' // icons
+    );
+  }, [isDark, theme.background]);
+
+  
   return (
     <>
       <StatusBar
@@ -168,7 +180,7 @@ function RootNavigator({ isFirstLaunch }) {
           <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
         </>
       )}
-    </Stack.Navigator> 
+    </Stack.Navigator>
   );
 }
 
@@ -193,16 +205,16 @@ export default function App() {
 
         // Check for first launch
         const hasLaunched = await AsyncStorage.getItem('hasLaunched');
-        setIsFirstLaunch(hasLaunched === null); 
+        setIsFirstLaunch(hasLaunched === null);
 
         //Fonts loading
         await Font.loadAsync({
-          'GilroyRegular': require('./assets/fonts/Gilroy-Regular.ttf'), 
+          'GilroyRegular': require('./assets/fonts/Gilroy-Regular.ttf'),
           'GilroyMedium': require('./assets/fonts/Gilroy-Medium.ttf'),
           'GilroySemiBold': require('./assets/fonts/Gilroy-SemiBold.ttf'),
           'Degular-SemiBold': require('./assets/fonts/Degular-SemiBold.otf'),
         });
-        
+
         //Tab icons loading
         await Promise.all([
           Asset.fromModule(require('./assets/homeActiveDark1.png')).downloadAsync(),
@@ -224,7 +236,7 @@ export default function App() {
         // Example delay (replace with real loading)
         // await new Promise(resolve => setTimeout(resolve, 2000));
 
-        
+
       } catch (e) {
         console.warn(e);
       } finally {
@@ -254,7 +266,7 @@ export default function App() {
                     <SafeAreaProvider>
                       <GestureHandlerRootView style={{ flex: 1 }}>
                         <BottomSheetModalProvider>
-                          <RootNavigator isFirstLaunch={isFirstLaunch}/>
+                          <RootNavigator isFirstLaunch={isFirstLaunch} />
                         </BottomSheetModalProvider>
                       </GestureHandlerRootView>
                     </SafeAreaProvider>

@@ -18,6 +18,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Directory, File, Paths } from 'expo-file-system';
 import AppText from './AppText';
 import { defaults } from '../designToken';
+import { Asset } from 'expo-asset';
 
 const PreciousMomentsCard = () => {
     const { theme, isDark } = useContext(ThemeContext);
@@ -33,30 +34,7 @@ const PreciousMomentsCard = () => {
 
     // Plant folder
     const plantFolder = new Directory(Paths.document, `plant_${selectedPlant.id}`);
-    const plantFolderUri = `${Paths.document}/plant_${selectedPlant.id}/`;
 
-    // Load all images for the selected plant
-    // const loadPlantImages = async () => {
-    //     try {
-    //         // if (!plantFolderUri.exists) {
-    //         //     setPlantImages([]);
-    //         //     return;
-    //         // }
-    //         if (!(await plantFolder.exists())) {
-    //             setPlantImages([]);
-    //             return;
-    //         }
-
-    //         // Get all files in the folder
-    //         const files = plantFolder.files.filter(f => f.name.endsWith('.jpg'));
-    //         const uris = files.map(f => f.uri);
-
-    //         setPlantImages(uris);
-    //     } catch (error) {
-    //         console.error('Error loading plant images:', error);
-    //         setPlantImages([]);
-    //     }
-    // };
     const loadPlantImages = () => {
         try {
             if (!plantFolder.exists) {
@@ -97,9 +75,22 @@ const PreciousMomentsCard = () => {
                 quality: 1,
             });
 
-            if (result.canceled) return;
 
-            const selectedUri = result.assets[0].uri;
+            // const selectedUri = result.assets[0].uri;
+            const asset = result.assets[0];
+            const selectedUri = asset.uri;
+
+
+            // NEW: Extract timestamp from EXIF if available (capture date), else use now
+            let timestamp = Date.now();
+            if (asset.exif && asset.exif.DateTimeOriginal) {
+                // EXIF DateTimeOriginal format: "YYYY:MM:DD HH:MM:SS"
+                const dtStr = asset.exif.DateTimeOriginal.replace(/:/g, '-').split(' ').join('T');
+                const parsedDate = new Date(dtStr);
+                if (!isNaN(parsedDate.getTime())) {
+                    timestamp = parsedDate.getTime();
+                }
+            }
 
             // Resize/compress image
             const manipResult = await ImageManipulator.manipulateAsync(
@@ -113,7 +104,7 @@ const PreciousMomentsCard = () => {
                 await plantFolder.create({ intermediates: true });
             }
 
-            const destFile = new File(plantFolder.uri, `${Date.now()}.jpg`);
+            const destFile = new File(plantFolder.uri, `${timestamp}.jpg`);
             await new File(manipResult.uri).copy(destFile);
 
             // Add new image at the START of the list
@@ -198,31 +189,6 @@ const PreciousMomentsCard = () => {
 
 
             {/* Fullscreen Modal */}
-            {/* <Modal
-                visible={modalVisible}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <Image
-                        source={{ uri: plantImages[activeImageIndex] + '?cb=' + cacheBuster }}
-                        style={styles.fullscreenImage}
-                    />
-                    <TouchableOpacity
-                        style={styles.deleteButton}
-                        onPress={() => deleteImage(activeImageIndex)}
-                    >
-                        <Text style={styles.deleteButtonText}>Delete</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => setModalVisible(false)}
-                    >
-                        <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modal> */}
             <Modal
                 visible={modalVisible}
                 transparent={true}
@@ -236,6 +202,27 @@ const PreciousMomentsCard = () => {
                         onPress={() => setModalVisible(false)}
                     />
 
+                    {activeImageIndex !== null && (() => {
+                        const uri = plantImages[activeImageIndex];
+                        const filename = uri.split('/').pop();
+                        const timestampStr = filename.replace('.jpg', '');
+                        const timestamp = parseInt(timestampStr, 10);
+                        let formattedDate = 'Unknown';
+                        if (!isNaN(timestamp)) {
+                            const date = new Date(timestamp);
+                            formattedDate = date.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                            }); // e.g., "Jan 15, 2026" - customize as needed
+                        }
+                        return (
+                            <AppText style={{color: '#fff', fontSize: 16  }}>
+                                Photo added on: {formattedDate}
+                            </AppText>
+                        );
+                    })()}
+
                     <Image
                         source={{
                             uri: activeImageIndex !== null
@@ -245,6 +232,7 @@ const PreciousMomentsCard = () => {
                         style={styles.fullscreenImage}
                         resizeMode="contain"
                     />
+
 
                     {/* Delete Button - Bottom Right */}
                     <TouchableOpacity
@@ -346,6 +334,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 6,
+        marginBottom: 20,
     },
     deleteFab: {
         bottom: 40,

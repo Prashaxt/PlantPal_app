@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import AppText from './AppText'
 import { defaults } from '../designToken';
 import { ThemeContext } from '../context/ThemeContext';
@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useUserData } from '../context/UserDataContext';
 import { Ionicons } from '@expo/vector-icons';
 import { File, Paths } from 'expo-file-system';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const UserProfileCard = () => {
@@ -17,33 +18,37 @@ const UserProfileCard = () => {
 
     const [avatarUri, setAvatarUri] = useState(null);
     const [cacheBuster, setCacheBuster] = useState(Date.now());
+    
+    const avatarFile = new File(Paths.document, `avatar_${user?.uid}.jpg`);
 
-
-
-    useEffect(() => {
-        if (!user?.uid) {
-            setAvatarUri(null);
-            return;
-        }
-
-        const avatarFile = new File(Paths.document, `avatar_${user.uid}.jpg`);
-
-        const loadAvatar = async () => {
-            try {
-                if (avatarFile.exists) {
-                    setAvatarUri(avatarFile.uri);
-                    setCacheBuster(Date.now());
-                } else {
-                    setAvatarUri(null);
-                }
-            } catch (error) {
-                console.error('Error loading avatar in UserProfileCard:', error);
+    const loadAvatar = async () => {
+        try {
+            if (await avatarFile.exists) {
+                setAvatarUri(avatarFile.uri);
+                setCacheBuster(Date.now());
+            } else {
                 setAvatarUri(null);
             }
-        };
+        } catch (error) {
+            console.error('Error loading avatar in UserProfileCard:', error);
+            setAvatarUri(null);
+        }
+    };
 
-        loadAvatar();
+    useEffect(() => {
+        if (user?.uid) {
+            loadAvatar(); // Keep initial load on uid change
+        }
     }, [user?.uid]);
+
+    //Reload avatar every time the screen focuses
+    useFocusEffect(
+        useCallback(() => {
+            if (user?.uid) {
+                loadAvatar();
+            }
+        }, [user?.uid])
+    );
 
     if (!userData) return null;
 
@@ -55,7 +60,7 @@ const UserProfileCard = () => {
                         source={{ uri: avatarUri + '?cb=' + cacheBuster }}
                         style={styles.profilePhotoImg} />
                 ) : (
-                    <Ionicons name="person-outline" size={60} color="#aaa" />
+                    <Ionicons name="person-outline" size={100} color="#aaa" left={10} />
                 )}
             </View>
             <View style={styles.profileDetails}>
