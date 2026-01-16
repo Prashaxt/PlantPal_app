@@ -7,8 +7,18 @@
     "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-screen.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "splash": {
+        "image": "./assets/splash-screen.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#ffffff"
+      }
     },
     "android": {
       "permissions": [
@@ -16,6 +26,11 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/app-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "splash": {
+        "image": "./assets/splash-screen.png",
+        "resizeMode": "cover",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
