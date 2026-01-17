@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
 import { usePlants } from '../context/PlantContext';
 import AppText from '../components/AppText';
@@ -10,10 +10,13 @@ import PreciousMomentsCard from '../components/PreciousMomentsCard';
 import Aisays from '../components/Aisays';
 import WaterNowCard from '../components/WaterNowCard';
 import { defaults } from '../designToken';
+import { useNavigation } from '@react-navigation/native';
+
 
 export default function HomeScreen() {
   const { theme } = useContext(ThemeContext);
   const { plants, loading } = usePlants();
+  const navigation = useNavigation();
 
   if (loading) {
     return (
@@ -29,7 +32,11 @@ export default function HomeScreen() {
 
       {plants.length === 0 ? (
         <View style={styles.noPlantContainer}>
-          <Text style={[styles.noPlantText, { color: theme.text }]}>No plant</Text>
+          <Text style={[styles.noPlantText, { color: theme.text }]}>No plants to show</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('AddPlant', { screen: 'AddPlantHardware', })} style={styles.addButton}>
+            <AppText style={styles.addButtonTextTop}>+</AppText>
+            <AppText style={styles.addButtonText}>Add a Plant</AppText>
+          </TouchableOpacity>
         </View>
       ) : (
         <ScrollView
@@ -58,11 +65,24 @@ const styles = StyleSheet.create({
   },
   noPlantContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   noPlantText: {
+    marginTop: 25,
     fontSize: 18,
     fontWeight: 'bold',
+    justifySelf: 'flex-start',
   },
+  addButton: {
+    marginTop: 'auto',
+    marginBottom: 'auto',
+  },
+  addButtonTextTop: {
+    fontSize: 60,
+    textAlign: 'center',
+  },
+  addButtonText: {
+    fontSize: 20,
+    textAlign: 'center',
+  }
+
 });

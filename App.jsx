@@ -31,6 +31,7 @@ import { auth } from './firebaseConfig';
 import { Asset } from 'expo-asset';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingScreen from './screens/OnboardingScreen';
+import HomeStack from './navigation/HomeStack';
 
 
 const Tab = createBottomTabNavigator();
@@ -72,7 +73,7 @@ function AuthenticatedApp() {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={HomeStack}
           options={{
             tabBarIcon: ({ focused }) => {
               let iconSource;
