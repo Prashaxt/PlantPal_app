@@ -10,14 +10,14 @@
     "splash": {
       "image": "./assets/splash-screen.png",
       "resizeMode": "cover",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#10534C"
     },
     "ios": {
       "supportsTablet": true,
       "splash": {
         "image": "./assets/splash-screen.png",
         "resizeMode": "cover",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#10534C"
       }
     },
     "android": {
@@ -31,7 +31,7 @@
       "splash": {
         "image": "./assets/splash-screen.png",
         "resizeMode": "native",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#10534C"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.example.plantpal",
@@ -46,7 +46,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#10534C",
           "image": "./assets/splash-screen.png",
           "resizeMode": "cover"
         }

@@ -3,20 +3,27 @@ import { View, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
 import AppText from '../components/AppText';
 import { defaults } from '../designToken';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../context/AuthContext';
+import { CommonActions } from '@react-navigation/native';
 
 
 const OnboardingScreen = ({ navigation }) => {
-    const { user } = useAuth();
 
     const completeOnboarding = async () => {
-    try {
-      await AsyncStorage.setItem('hasLaunched', 'true');
-      navigation.replace(user ? 'Main' : 'Login'); 
-    } catch (error) {
-      console.error('Error setting onboarding flag:', error);
-    }
-  };
+        try {
+            // Mark onboarding as completed
+            await AsyncStorage.setItem('hasLaunched', 'true');
+            
+            // Reset navigation to remove onboarding from stack and go to Login
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' }],
+                })
+            );
+        } catch (error) {
+            console.error('Error setting onboarding flag:', error);
+        }
+    };
 
 
     return (

@@ -20,8 +20,11 @@ import wateringAnimation from "../assets/waterLoading.json";
 const WaterNowCard = () => {
     const { updateMotorStatus, hardwareActive } = useContext(ConnectionContext);
     const { selectedPlant } = useContext(PlantContext);
-    const duration = Number(selectedPlant?.waterDuration ?? 10);
 
+    // Early return if no plant selected
+    if (!selectedPlant) return null;
+
+    const duration = Number(selectedPlant?.waterDuration ?? 10);
 
     const [modalOneVisible, setModalOneVisible] = useState(false);
     const [modalTwoVisible, setModalTwoVisible] = useState(false);
@@ -124,16 +127,7 @@ const WaterNowCard = () => {
             <Modal visible={modalOneVisible} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalOneBox}>
-                        {/* <View style={styles.modalTopLayer}>
-                            <TouchableOpacity onPress={closeModalTwo}>
-                                <Image
-                                    source={require('../assets/close-circle.png')}
-                                    style={styles.closeImg}
-                                    resizeMode="contain"
-                                />
-                            </TouchableOpacity>
-                        </View> */}
-                        <AppText style={styles.wateringText}>Watering {selectedPlant.nickname} </AppText>
+                        <AppText style={styles.wateringText}>Watering {selectedPlant?.nickname || 'Plant'} </AppText>
                         <View style={{ position: 'relative', width: 250, height: 200 }}>
                             <AnimatedLottieView
                                 source={wateringAnimation}
@@ -186,10 +180,7 @@ const WaterNowCard = () => {
                             />
                         </View>
                         <AppText style={styles.wateringDoneText}>Hydration Completed !</AppText>
-                        <AppText style={styles.wateringDoneText}>Watered {selectedPlant.nickname} for {duration} sec.</AppText>
-                        {/* <TouchableOpacity style={styles.okayButton} onPress={closeModalTwo}>
-                            <AppText style={styles.cancelText}>Yayy</AppText>
-                        </TouchableOpacity> */}
+                        <AppText style={styles.wateringDoneText}>Watered {selectedPlant?.nickname || 'Plant'} for {duration} sec.</AppText>
                     </View>
                 </View>
             </Modal>

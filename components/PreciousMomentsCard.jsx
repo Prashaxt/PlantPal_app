@@ -116,22 +116,40 @@ const PreciousMomentsCard = () => {
         }
     };
 
+
     // Delete an image
     const deleteImage = async index => {
-        try {
-            const fileToDelete = new File(plantImages[index]);
-            if (fileToDelete.exists) {
-                await fileToDelete.delete();
-            }
+        Alert.alert(
+            'Delete Photo',
+            'Are you sure you want to delete this photo?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const fileToDelete = new File(plantImages[index]);
+                            if (fileToDelete.exists) {
+                                await fileToDelete.delete();
+                            }
 
-            const updated = plantImages.filter((_, i) => i !== index);
-            setPlantImages(updated);
-            setModalVisible(false);
-            setCacheBuster(Date.now());
-        } catch (error) {
-            console.error('Error deleting image:', error);
-            Alert.alert('Error', 'Failed to delete image.');
-        }
+                            const updated = plantImages.filter((_, i) => i !== index);
+                            setPlantImages(updated);
+                            setModalVisible(false);
+                            setActiveImageIndex(null); // Reset active index
+                            setCacheBuster(Date.now());
+                        } catch (error) {
+                            console.error('Error deleting image:', error);
+                            Alert.alert('Error', 'Failed to delete image.');
+                        }
+                    },
+                },
+            ]
+        );
     };
 
     // Open modal
@@ -202,7 +220,7 @@ const PreciousMomentsCard = () => {
                         onPress={() => setModalVisible(false)}
                     />
 
-                    {activeImageIndex !== null && (() => {
+                    {activeImageIndex !== null && plantImages[activeImageIndex] && (() => {
                         const uri = plantImages[activeImageIndex];
                         const filename = uri.split('/').pop();
                         const timestampStr = filename.replace('.jpg', '');
@@ -217,21 +235,21 @@ const PreciousMomentsCard = () => {
                             }); // e.g., "Jan 15, 2026" - customize as needed
                         }
                         return (
-                            <AppText style={{color: '#fff', fontSize: 16  }}>
+                            <AppText style={{ color: '#fff', fontSize: 16 }}>
                                 Photo added on: {formattedDate}
                             </AppText>
                         );
                     })()}
 
-                    <Image
-                        source={{
-                            uri: activeImageIndex !== null
-                                ? plantImages[activeImageIndex] + '?cb=' + cacheBuster
-                                : undefined,
-                        }}
-                        style={styles.fullscreenImage}
-                        resizeMode="contain"
-                    />
+                    {activeImageIndex !== null && plantImages[activeImageIndex] && (
+                        <Image
+                            source={{
+                                uri: plantImages[activeImageIndex] + '?cb=' + cacheBuster
+                            }}
+                            style={styles.fullscreenImage}
+                            resizeMode="contain"
+                        />
+                    )}
 
 
                     {/* Delete Button - Bottom Right */}

@@ -59,10 +59,18 @@ export const PlantProvider = ({ children }) => {
 
       const docRef = await addDoc(plantsCollectionRef, plantToSave);
 
-      setPlants(prev => [
-        ...prev,
-        { id: docRef.id, ...plantToSave, image: plantMascotImages[plantToSave.imageIndex] },
-      ]);
+      const newPlant = {
+        id: docRef.id,
+        ...plantToSave,
+        image: plantMascotImages[plantToSave.imageIndex]
+      };
+
+      setPlants(prev => [...prev, newPlant]);
+
+      // Auto-select the newly added plant if no plant is currently selected
+      if (!selectedPlant) {
+        setSelectedPlant(newPlant);
+      }
     } catch (error) {
       console.error('Error adding plant:', error);
     }

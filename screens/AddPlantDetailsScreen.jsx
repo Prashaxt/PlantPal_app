@@ -17,10 +17,11 @@ import AppText from '../components/AppText';
 import { defaults } from '../designToken';
 import { plantMascotImages } from '../components/plantMascotImages';
 import { Switch } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 
 const AddPlantDetailsScreen = ({ route, navigation }) => {
   const { hardwareId } = route.params;
-  const { addPlant } = useContext(PlantContext);
+  const { addPlant, plants } = useContext(PlantContext);
   const { theme } = useContext(ThemeContext);
 
   const [nickname, setNickname] = useState('');
@@ -62,14 +63,36 @@ const AddPlantDetailsScreen = ({ route, navigation }) => {
     };
 
     try {
+      // Check if this is the first plant
+      const isFirstPlant = plants.length === 0;
+
       await addPlant(newPlant);
+
       Alert.alert('Success!', `${nickname} has been added!`, [
         {
           text: 'OK',
           onPress: () => {
-            navigation.navigate('Garden', {
-              screen: 'GardenHome',
-            });
+            if (isFirstPlant) {
+              // If this is the first plant, reset navigation to Home tab
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'Home',
+                      state: {
+                        routes: [{ name: 'HomeScreen' }],
+                      },
+                    },
+                  ],
+                })
+              );
+            } else {
+              // Otherwise, navigate to Garden as before
+              navigation.navigate('Garden', {
+                screen: 'GardenHome',
+              });
+            }
           }
         },
       ]);

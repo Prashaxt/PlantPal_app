@@ -5,7 +5,6 @@ import { FontProvider } from './context/FontContext';
 import { View, StyleSheet, Text } from 'react-native';
 import { ThemeContext, ThemeProvider } from './context/ThemeContext';
 import { ConnectionProvider } from './context/ConnectionContext';
-import HomeScreen from './screens/HomeScreen';
 import { StatusBar, Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
@@ -170,7 +169,7 @@ function RootNavigator({ isFirstLaunch }) {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={isFirstLaunch ? 'Onboarding' : (user ? 'Main' : 'Login')}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isFirstLaunch && <Stack.Screen name="Onboarding" component={OnboardingScreen} />}
       {user ? (
         <Stack.Screen name="Main" component={AuthenticatedApp} />
@@ -248,6 +247,20 @@ export default function App() {
 
     prepare();
   }, []);
+
+  // Listen for changes to hasLaunched
+  useEffect(() => {
+    const checkLaunchStatus = async () => {
+      const hasLaunched = await AsyncStorage.getItem('hasLaunched');
+      if (hasLaunched !== null && isFirstLaunch === true) {
+        setIsFirstLaunch(false);
+      }
+    };
+
+    // Check every time the app comes to foreground
+    const interval = setInterval(checkLaunchStatus, 1000);
+    return () => clearInterval(interval);
+  }, [isFirstLaunch]);
 
 
   // Keep splash visible while preparing
