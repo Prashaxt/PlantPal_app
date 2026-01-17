@@ -30,7 +30,7 @@
       },
       "splash": {
         "image": "./assets/splash-screen.png",
-        "resizeMode": "cover",
+        "resizeMode": "native",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
