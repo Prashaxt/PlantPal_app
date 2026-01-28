@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Linking, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useContext } from 'react'
 import { defaults } from '../designToken'
 import { ThemeContext } from '../context/ThemeContext';
@@ -135,7 +135,9 @@ const SettingsCard = () => {
 
 
                 {/* Help and Support */}
-                <TouchableOpacity style={[styles.settingsTraySection, styles.settingsTraySectionBorder, { borderColor: theme.settingsTraySectionBorder }]} onPress={() => { alert('will be added later ') }}>
+                <TouchableOpacity 
+                style={[styles.settingsTraySection, styles.settingsTraySectionBorder, { borderColor: theme.settingsTraySectionBorder }]} 
+                onPress={() => { Linking.openURL("https://plantpal-kappa-six.vercel.app"); }}>
                     <View style={styles.left}>
                         <View style={styles.iconBox}>
                             <Image
@@ -149,7 +151,9 @@ const SettingsCard = () => {
                 </TouchableOpacity>
 
                 {/* About Plantpal */}
-                <TouchableOpacity style={[styles.settingsTraySection, styles.settingsTraySectionBorder, { borderColor: theme.settingsTraySectionBorder }]} onPress={() => { alert('will be added later ') }}>
+                <TouchableOpacity 
+                style={[styles.settingsTraySection, styles.settingsTraySectionBorder, { borderColor: theme.settingsTraySectionBorder }]} 
+                onPress={() => { Linking.openURL("https://plantpal-kappa-six.vercel.app"); }}>
                     <View style={styles.left}>
                         <View style={styles.iconBox}>
                             <Image
