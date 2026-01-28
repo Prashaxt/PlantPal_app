@@ -31,7 +31,8 @@ import { Asset } from 'expo-asset';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingScreen from './screens/OnboardingScreen';
 import HomeStack from './navigation/HomeStack';
-
+import NetInfo from "@react-native-community/netinfo";
+import NoInternetModal from './components/ui-components/NoInternetModal';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -40,7 +41,6 @@ SplashScreen.preventAutoHideAsync();
 
 function AuthenticatedApp() {
   const { theme, isDark } = useContext(ThemeContext);
-
 
   //NavBar theme settings
   useEffect(() => {
@@ -188,6 +188,35 @@ export default function App() {
 
   const [appIsReady, setAppIsReady] = useState(false);
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+  const [isConnected, setIsConnected] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [appKey, setAppKey] = useState(0);
+
+  //Internet connection
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      const connected =
+        state.isConnected && state.isInternetReachable !== false;
+
+       if (connected) {
+      setShowModal(false);
+      setAppKey(prev => prev + 1); 
+    } else {
+      setShowModal(true);
+    }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const retryConnection = async () => {
+    const state = await NetInfo.fetch();
+    const connected =
+      state.isConnected && state.isInternetReachable !== false;
+
+    setIsConnected(connected);
+    setShowModal(!connected);
+  };
 
 
   //SplashScreen loading
@@ -264,7 +293,7 @@ export default function App() {
 
 
   // Keep splash visible while preparing
-  if (!appIsReady || isFirstLaunch === null) { // Wait for first-launch check too
+  if (!appIsReady || isFirstLaunch === null) {
     return null;
   }
 
@@ -278,7 +307,8 @@ export default function App() {
                 <ConnectionProvider>
                   <MeasurementUnitProvider>
                     <SafeAreaProvider>
-                      <GestureHandlerRootView style={{ flex: 1 }}>
+                      <GestureHandlerRootView style={{ flex: 1 }} key={appKey}>
+                        <NoInternetModal visible={showModal} onRetry={retryConnection} />
                         <BottomSheetModalProvider>
                           <RootNavigator isFirstLaunch={isFirstLaunch} />
                         </BottomSheetModalProvider>

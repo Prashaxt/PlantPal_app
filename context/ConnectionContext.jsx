@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { ref, get, set, onValue, off } from "firebase/database";
 import { db } from '../firebaseConfig';
-console.log('Imported db:', db);
 
 import { AppState } from "react-native";
 import { PlantContext } from "../context/PlantContext";
