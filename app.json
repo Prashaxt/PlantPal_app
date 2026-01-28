@@ -2,7 +2,14 @@
   "expo": {
     "name": "PlantPal",
     "slug": "PlantPal",
-    "version": "1.0.0",
+    "version": "1.0.3",
+    "updates": {
+      "url": "https://u.expo.dev/8747c833-3ece-4a08-afa1-7eff2b23c24c",
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "automatic",
@@ -57,6 +64,7 @@
       "eas": {
         "projectId": "8747c833-3ece-4a08-afa1-7eff2b23c24c"
       }
-    }
+    },
+    "owner": "prashaxt"
   }
 }
